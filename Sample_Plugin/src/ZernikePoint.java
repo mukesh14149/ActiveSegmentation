@@ -1,8 +1,8 @@
 public class ZernikePoint {
 
-    private final Complex[] pTp;
-    public final double m;
-    private double in; 
+    private final Complex[] pTp; // x^p y^q
+    public final double m; //it is r (modulus)
+    private double in;  // pixel intensity
     
 
     public Complex getPosition(int exponent) throws IllegalArgumentException {

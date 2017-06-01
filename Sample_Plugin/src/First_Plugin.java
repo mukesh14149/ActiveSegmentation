@@ -20,20 +20,21 @@ public class First_Plugin extends ImagePlus implements PlugIn{
         }
         return x;
 }
-
+    //find zernike moments.
+    // n is order and m is repittion
     private static Complex zernikeMoment(ZernikePoint[] zps, int zpsSize, int n, int m) {
         int p = (n - m) / 2;
         int q = (n + m) / 2;
         Complex v = new Complex(0, 0);
         double[] gm = new double[p + 1];
-
+        //find coeficients of Radial polynomial
         for (int i = 0; i <= p; i += 2) {
             gm[i] = factorial(n - i) / (factorial(i) * factorial(q - i) * factorial(p - i));
         }
         for (int i = 1; i <= p; i += 2) {
             gm[i] = -factorial(n - i) / (factorial(i) * factorial(q - i) * factorial(p - i));
         }
-
+        
         for (int i = 0; i < zpsSize; i++) {
             double r = zps[i].m;
             Complex z = zps[i].getPosition(m);
@@ -47,35 +48,29 @@ public class First_Plugin extends ImagePlus implements PlugIn{
         v = v.multiply((n + 1) / Math.PI);
         return v;
     }
-
-    public static double[] zernikeMoments(BufferedImage img, int degree, Point2D center, double radius) {
-        if (img.getType() != BufferedImage.TYPE_BYTE_GRAY) {
-            BufferedImage t = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-            t.getGraphics().drawImage(img, 0, 0, null);
-            img = t;
-        }
-        byte[] imgBytes = ((DataBufferByte) img.getData().getDataBuffer()).getData();
-        return zernikeMoments(imgBytes, img.getWidth(), degree, center, radius);
-    }
-
+    
+    	
     public static double[] zernikeMoments(byte[] img, int imgWidth, int degree, Point2D center, double radius) {
-        int imgHeight = img.length / imgWidth;
+      
+    	int imgHeight = img.length / imgWidth;
         int zpsSize = (int) (Math.PI * radius * radius);
+        //create a array of zernikepoints of size area of a circle.
         ZernikePoint[] zps = new ZernikePoint[zpsSize];
         int totalIntensity = 0;
 
         int i = 0;
         for (int y0 = 0; y0 < imgHeight; y0++) {
-            double y = (y0 - center.getY()) / radius;
+            double y = (y0 - center.getY()) / radius; //set cooridinates according to circle center
             for (int x0 = 0; x0 < imgWidth; x0++) {
-                double x = (x0 - center.getX()) / radius;
-                double r = Math.hypot(x, y);
-                if (r <= 1) {
+                double x = (x0 - center.getX()) / radius; //set cooridinates according to circle center
+                //for polar form 
+                double r = Math.hypot(x, y); 
+                if (r <= 1) { //if r>1 it means it is out of circle
                     int c = img[x0 + y0 * imgWidth] & 0xFF;
-                    if (c > 0) {
+                    if (c > 0) { //check intensity,it should be greater then 0;
                         r = Math.max(r, 1e-9);
-                        Complex z = new Complex(x / r, y / r);
-                        zps[i] = new ZernikePoint(z, r, c, degree);
+                        Complex z = new Complex(x / r, y / r); //make a complex no.
+                        zps[i] = new ZernikePoint(z, r, c, degree); 
                         totalIntensity += c;
                         i++;
                     }
@@ -102,6 +97,19 @@ public class First_Plugin extends ImagePlus implements PlugIn{
 
     }
 
+    //Image converted to grayscale
+    public static double[] zernikeMoments(BufferedImage img, int degree, Point2D center, double radius) {
+        System.out.println(img.getHeight()+"MM"+img.getWidth());
+        if (img.getType() != BufferedImage.TYPE_BYTE_GRAY) {
+            BufferedImage t = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+            t.getGraphics().drawImage(img, 0, 0, null);
+            img = t;
+        }
+        //System.out.println(img.getHeight()+"MM"+img.getWidth());
+        byte[] imgBytes = ((DataBufferByte) img.getData().getDataBuffer()).getData();
+        return zernikeMoments(imgBytes, img.getWidth(), degree, center, radius);
+    }
+
 
     @Override
     public void run(String arg0) {
@@ -109,7 +117,6 @@ public class First_Plugin extends ImagePlus implements PlugIn{
         ///home/mg/Pictures/aaa.png
         ImagePlus imp = IJ.openImage("http://imagej.net/images/clown.jpg");
         imp.show();
-      //  System.out.println("dddddd");
 
         final int centerX = imp.getWidth() / 2;
         final int centerY = imp.getHeight() / 2;
@@ -139,7 +146,7 @@ public class First_Plugin extends ImagePlus implements PlugIn{
 
     public static void main(String[] args) {
         //System.out.println(System.getProperty("plugins.dir"));
-        new ij.ImageJ();
+       // new ij.ImageJ();
         new First_Plugin().run("");
     }
 }

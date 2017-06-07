@@ -1,31 +1,45 @@
 
 public class Complex {
+        /** real part. */
+        private double m_real;
 
-    public final double real;
-    public final double imag;
+        /** imaginary part. */
+        private double m_imaginary;
 
-    Complex(double real, double imag) {
-        this.real = real;
-        this.imag = imag;
-    }
+        public Complex(final double real) {
+            m_real = real;
+            m_imaginary = 0;
+        }
 
-    public Complex conjugate() {
-        return new Complex(real, -1 * imag);
-    }
+        public Complex(final double real, final double imaginary) {
+            m_real = real;
+            m_imaginary = imaginary;
+        }
 
-    public Complex add(Complex z) {
-        return new Complex(real + z.real, imag + z.imag);
-    }
+        public double getReal() {
+            return m_real;
+        }
 
-    public Complex multiply(double x) {
-        return new Complex(real * x, imag * x);
-    }
+        public double getImaginary() {
+            return m_imaginary;
+        }
 
-    public Complex multiply(Complex z) {
-        return new Complex(real * z.real - imag * z.imag, real * z.imag + imag * z.real);
-    }
+        public Complex multiplyTo(final Complex c) {
+            return new Complex((this.m_real * c.m_real) - (this.m_imaginary * c.m_imaginary),
+                    (this.m_real * c.m_imaginary) + (this.m_imaginary * c.m_real));
+        }
 
-    public double modulus() {
-        return Math.hypot(real, imag);
-    }
-}
+        public void add(final Complex c) {
+            m_real += c.m_real;
+            m_imaginary += c.m_imaginary;
+        }
+        
+        public Complex conjugate() {
+            return new Complex(this.m_real, this.m_imaginary);
+        }
+
+        public double abs() {
+            return Math.sqrt((m_real * m_real) + (m_imaginary * m_imaginary));
+        }
+ }
+
